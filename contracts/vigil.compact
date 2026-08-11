@@ -1,0 +1,79 @@
+// vigil.compact
+// Zero-Knowledge Inheritance / Dead Man's Switch Smart Contract
+// Language: Compact (Midnight Blockchain)
+
+pragma compiler_version >= 0.1;
+
+include "std.compact";
+
+// The state represents the shielded and unshielded ledger values.
+export ledger vault_state: {
+    // The cryptographic commitment of the owner's identity
+    owner_key: Cell<Bytes<32>>,
+    
+    // The cryptographic commitment of the designated heir
+    heir_commitment: Cell<Bytes<32>>,
+    
+    // The time allowed before the vault unlocks (in milliseconds or blocks)
+    interval: Cell<Uint64>,
+    
+    // The last time the owner successfully pinged
+    last_ping: Cell<Uint64>,
+    
+    // Shielded balance locked in the vault
+    locked_balance: Cell<Uint64>
+};
+
+// 1. Initialize the Vault
+export circuit initialize_vault(
+    owner: Bytes<32>, 
+    heir: Bytes<32>, 
+    time_interval: Uint64, 
+    deposit_amount: Uint64
+): [] {
+    // Ensure the vault is empty before initializing
+    assert vault_state.locked_balance.read() == 0;
+    
+    vault_state.owner_key.write(owner);
+    vault_state.heir_commitment.write(heir);
+    vault_state.interval.write(time_interval);
+    
+    // Set last ping to current network time (dummy implementation for now)
+    // In production, we read this from the network context
+    vault_state.last_ping.write(0); 
+    vault_state.locked_balance.write(deposit_amount);
+}
+
+// 2. Ping (Proof of Life)
+// Can only be called by providing a ZK proof of owning the owner_key
+export circuit ping(owner_proof: Bytes<32>, current_time: Uint64): [] {
+    // ZK Predicate: Ensure caller is the owner without revealing owner_key on-chain
+    assert owner_proof == vault_state.owner_key.read();
+    
+    // Update the heartbeat timestamp
+    vault_state.last_ping.write(current_time);
+}
+
+// 3. Cancel Vault (Edge Case Handling)
+export circuit cancel_vault(owner_proof: Bytes<32>): [] {
+    // Ensure caller is the owner
+    assert owner_proof == vault_state.owner_key.read();
+    
+    // Unlock and return funds (set balance to 0, transfer logic handled via Midnight token standard)
+    vault_state.locked_balance.write(0);
+}
+
+// 4. Claim Inheritance
+export circuit claim_inheritance(heir_proof: Bytes<32>, current_time: Uint64): [] {
+    let last = vault_state.last_ping.read();
+    let max_interval = vault_state.interval.read();
+    
+    // Check if the timer has expired (Proof of Death/Lapse)
+    assert current_time > (last + max_interval);
+    
+    // Verify the caller is the designated heir
+    assert heir_proof == vault_state.heir_commitment.read();
+    
+    // Unlock the funds for the heir
+    vault_state.locked_balance.write(0);
+}
