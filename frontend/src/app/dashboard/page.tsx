@@ -1,11 +1,39 @@
+"use client";
+import { useState } from "react";
+import { MockMidnightSDK } from "@/lib/midnightMock";
+
 export default function Dashboard() {
+  const [status, setStatus] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handlePing = async () => {
+    setIsProcessing(true);
+    setStatus("Generating Zero-Knowledge Proof of Ownership...");
+    await MockMidnightSDK.generatePingProof();
+    setStatus("Proof Validated! Heartbeat timer reset to 90 Days.");
+    setIsProcessing(false);
+  };
+
+  const handleCancel = async () => {
+    setIsProcessing(true);
+    setStatus("Generating ZK Proof to cancel vault...");
+    await MockMidnightSDK.generateCancelProof();
+    setStatus("Vault Cancelled. Funds unshielded and returned to your wallet.");
+    setIsProcessing(false);
+  };
+
   return (
     <div className="flex-1 flex flex-col items-center p-12">
       <div className="max-w-3xl w-full">
         <h2 className="text-3xl font-bold mb-2">Owner Dashboard</h2>
         <p className="text-gray-400 mb-8">Manage your shielded inheritance vault and broadcast your proof of life.</p>
         
-        {/* Mock Vault Status Card */}
+        {status && (
+          <div className="bg-blue-900/30 border border-blue-800 text-blue-300 px-6 py-4 rounded-lg mb-6 animate-pulse">
+            {status}
+          </div>
+        )}
+
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 mb-8">
           <div className="flex justify-between items-start mb-6">
             <div>
@@ -29,10 +57,18 @@ export default function Dashboard() {
           </div>
           
           <div className="flex gap-4">
-            <button className="flex-1 bg-white text-black py-3 rounded-lg font-bold hover:bg-gray-200 transition-colors">
+            <button 
+              onClick={handlePing}
+              disabled={isProcessing}
+              className="flex-1 bg-white text-black py-3 rounded-lg font-bold hover:bg-gray-200 transition-colors disabled:opacity-50"
+            >
               Ping (Proof of Life)
             </button>
-            <button className="flex-1 bg-red-900/20 text-red-400 border border-red-900/50 py-3 rounded-lg font-bold hover:bg-red-900/40 transition-colors">
+            <button 
+              onClick={handleCancel}
+              disabled={isProcessing}
+              className="flex-1 bg-red-900/20 text-red-400 border border-red-900/50 py-3 rounded-lg font-bold hover:bg-red-900/40 transition-colors disabled:opacity-50"
+            >
               Cancel Vault
             </button>
           </div>
