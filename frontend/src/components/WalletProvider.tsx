@@ -1,6 +1,5 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
-import type { DAppConnectorAPI } from "@midnight-ntwrk/dapp-connector-api";
 
 interface WalletContextType {
   isConnected: boolean;
@@ -23,7 +22,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       // In a real environment, the Lace wallet injects into window.midnight.mnLace
       const midnightObj = (window as any).midnight;
       if (midnightObj && midnightObj.mnLace) {
-        const api: DAppConnectorAPI = await midnightObj.mnLace.enable();
+        const api: any = await midnightObj.mnLace.enable();
         // Fallback or real extraction of state depending on API version
         setIsConnected(true);
         setWalletAddress("0xLace...Connected"); 
