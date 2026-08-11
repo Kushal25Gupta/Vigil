@@ -108,19 +108,26 @@ To run the Vigil MVP locally and test the Zero-Knowledge shielded UI flow, pleas
 - **Node.js**: Ensure Node.js v18 or higher is installed.
 - **Lace Wallet**: Install the Lace Wallet browser extension and enable "Midnight Network" support.
 
-### 2. Installation
-Clone the repository and install the dependencies for the frontend application.
+### 2. Installation & Running (Docker - Recommended)
+The absolute easiest way to evaluate the UI is using Docker.
+
 ```bash
-# Clone the repository
 git clone https://github.com/Kushal25Gupta/Vigil.git
 cd Vigil/frontend
 
-# Install Next.js and Midnight SDK dependencies
-npm install
+# Build and run the image
+docker build -t vigil-frontend .
+docker run -p 3000:3000 vigil-frontend
 ```
+Navigate to `http://localhost:3000` in your browser.
 
-### 3. Running the Development Server
+### 3. Installation & Running (Manual / Node.js)
+If you prefer running without Docker:
 ```bash
+git clone https://github.com/Kushal25Gupta/Vigil.git
+cd Vigil/frontend
+
+npm install
 npm run dev
 ```
 Navigate to `http://localhost:3000` in your browser. 
