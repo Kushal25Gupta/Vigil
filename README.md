@@ -100,3 +100,32 @@ The Compact smart contract will have the following internal structure:
 
 ---
 *For the step-by-step master plan of how to build this, see `DEVELOPMENT_PLAN.md`.*
+
+## 🏁 Setup Instructions (For Hackathon Judges)
+To run the Vigil MVP locally and test the Zero-Knowledge shielded UI flow, please follow these steps:
+
+### 1. Prerequisites
+- **Node.js**: Ensure Node.js v18 or higher is installed.
+- **Lace Wallet**: Install the Lace Wallet browser extension and enable "Midnight Network" support.
+
+### 2. Installation
+Clone the repository and install the dependencies for the frontend application.
+```bash
+# Clone the repository
+git clone https://github.com/Kushal25Gupta/Vigil.git
+cd Vigil/frontend
+
+# Install Next.js and Midnight SDK dependencies
+npm install
+```
+
+### 3. Running the Development Server
+```bash
+npm run dev
+```
+Navigate to `http://localhost:3000` in your browser. 
+
+### 4. Testing the MVP Flow
+1. Click **"Connect Lace Wallet"** in the top right of the navigation bar. This will trigger the DApp Connector API.
+2. Navigate to the **Owner Dashboard** to view a mock active vault. Click **"Ping (Proof of Life)"** to see how the client-side ZK proof generation UI handles shielded network transactions.
+3. Navigate to the **Claim Portal** and input a test vault ID (e.g., `0x8fB3...9A1c`) to simulate the time-lock validation and heir ZK identity verification.
