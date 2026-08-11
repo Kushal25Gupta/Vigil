@@ -1,4 +1,9 @@
+"use client";
+import { useWallet } from "./WalletProvider";
+
 export default function Navbar() {
+  const { isConnected, connectWallet, isConnecting, walletAddress } = useWallet();
+
   return (
     <nav className="w-full border-b border-gray-800 bg-black text-white px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-2">
@@ -11,8 +16,12 @@ export default function Navbar() {
         <a href="/dashboard" className="text-gray-400 hover:text-white transition-colors">Owner Dashboard</a>
         <a href="/claim" className="text-gray-400 hover:text-white transition-colors">Claim Portal</a>
         
-        <button className="bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-gray-200 transition-colors">
-          Connect Lace Wallet
+        <button 
+          onClick={connectWallet}
+          disabled={isConnected || isConnecting}
+          className="bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-gray-200 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          {isConnecting ? "Connecting..." : isConnected ? "Connected" : "Connect Lace Wallet"}
         </button>
       </div>
     </nav>
