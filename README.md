@@ -101,38 +101,49 @@ The Compact smart contract will have the following internal structure:
 ---
 *For the step-by-step master plan of how to build this, see `DEVELOPMENT_PLAN.md`.*
 
-## 🏁 Setup Instructions (For Hackathon Judges)
-To run the Vigil MVP locally and test the Zero-Knowledge shielded UI flow, please follow these steps:
+## 🚀 Quick Start & Setup Guide (For Judges)
 
-### 1. Prerequisites
-- **Node.js**: Ensure Node.js v18 or higher is installed.
-- **Lace Wallet**: Install the Lace Wallet browser extension and enable "Midnight Network" support.
+We have prioritized making Vigil extremely easy to evaluate. You can run the entire frontend UI on your local machine using Docker or Node.js. 
 
-### 2. Installation & Running (Docker - Recommended)
-The absolute easiest way to evaluate the UI is using Docker.
+**✨ Zero-Friction Testing Feature:** If you do not have the Midnight Lace Wallet extension installed on your local browser, our application will gracefully inject a **Mock Wallet Connection**. This guarantees you can fully explore the UI, Dashboard, and Claim logic without needing to configure a DevNet environment!
+
+### Option A: Run with Docker (Recommended)
+This is the fastest way to get the production build running.
 
 ```bash
+# 1. Clone the repository
 git clone https://github.com/Kushal25Gupta/Vigil.git
 cd Vigil/frontend
 
-# Build and run the image
+# 2. Build the production Docker image
 docker build -t vigil-frontend .
+
+# 3. Run the container
 docker run -p 3000:3000 vigil-frontend
 ```
-Navigate to `http://localhost:3000` in your browser.
+*Open [http://localhost:3000](http://localhost:3000) in your browser.*
 
-### 3. Installation & Running (Manual / Node.js)
-If you prefer running without Docker:
+### Option B: Run Manually (Node.js)
+Ensure you have Node.js v18 or higher installed.
+
 ```bash
+# 1. Clone the repository
 git clone https://github.com/Kushal25Gupta/Vigil.git
 cd Vigil/frontend
 
-npm install
+# 2. Install dependencies
+npm ci
+
+# 3. Start the development server
 npm run dev
 ```
-Navigate to `http://localhost:3000` in your browser. 
+*Open [http://localhost:3000](http://localhost:3000) in your browser.*
 
-### 4. Testing the MVP Flow
-1. Click **"Connect Lace Wallet"** in the top right of the navigation bar. This will trigger the DApp Connector API.
-2. Navigate to the **Owner Dashboard** to view a mock active vault. Click **"Ping (Proof of Life)"** to see how the client-side ZK proof generation UI handles shielded network transactions.
-3. Navigate to the **Claim Portal** and input a test vault ID (e.g., `0x8fB3...9A1c`) to simulate the time-lock validation and heir ZK identity verification.
+### How to Test the MVP Flow
+1. **Authentication:** Click **"Connect Wallet"** in the navigation bar. Accept the mock wallet prompt if you do not have the Lace extension.
+2. **Owner Flow:** Navigate to **"Dashboard"**. You will see the active vault interface. Click **"Ping (Proof of Life)"** to simulate the local generation of a Zero-Knowledge ownership proof.
+3. **Heir Flow:** Navigate to the **"Claim Portal"**. Enter a test Vault ID (e.g. `0x8fB3`) and click **"Verify & Unshield Funds"** to simulate the smart contract time-lock validation and ZK identity proof generation.
+
+---
+
+## 🏗️ Vigil System Architecture
