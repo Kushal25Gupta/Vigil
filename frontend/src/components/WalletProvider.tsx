@@ -27,7 +27,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         setIsConnected(true);
         setWalletAddress("0xLace...Connected"); 
       } else {
-        alert("Lace Wallet with Midnight support not found. Please install the extension.");
+        // MOCK CONNECTION FOR HACKATHON DEMO
+        console.warn("Lace Wallet not found. Using Mock Wallet for Hackathon Demo purposes.");
+        // Simulate network delay for realism
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setIsConnected(true);
+        setWalletAddress("0xMock...B7a2");
       }
     } catch (error) {
       console.error("Wallet connection failed:", error);
