@@ -107,34 +107,41 @@ We have prioritized making Vigil extremely easy to evaluate. You can run the ent
 
 **✨ Zero-Friction Testing Feature:** If you do not have the Midnight Lace Wallet extension installed on your local browser, our application will gracefully inject a **Mock Wallet Connection**. This guarantees you can fully explore the UI, Dashboard, and Claim logic without needing to configure a DevNet environment!
 
-### Option A: Run with Docker (Recommended)
-This is the fastest way to get the production build running.
+### Option A: The One-Click Script (Recommended)
+If you have Docker installed, you can use our automated setup script to build and launch the application in one step.
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/Kushal25Gupta/Vigil.git
+cd Vigil
+
+# 2. Make the script executable
+chmod +x run.sh
+
+# 3. Run the script
+./run.sh
+```
+*Wait for the build to finish, then open [http://localhost:3000](http://localhost:3000) in your browser.*
+
+### Option B: Manual Docker Build
+If you prefer to run the Docker commands manually:
+
+```bash
+git clone https://github.com/Kushal25Gupta/Vigil.git
 cd Vigil/frontend
 
-# 2. Build the production Docker image
 docker build -t vigil-frontend .
-
-# 3. Run the container
 docker run -p 3000:3000 vigil-frontend
 ```
-*Open [http://localhost:3000](http://localhost:3000) in your browser.*
 
-### Option B: Run Manually (Node.js)
+### Option C: Run Manually (Node.js)
 Ensure you have Node.js v18 or higher installed.
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/Kushal25Gupta/Vigil.git
 cd Vigil/frontend
 
-# 2. Install dependencies
 npm ci
-
-# 3. Start the development server
 npm run dev
 ```
 *Open [http://localhost:3000](http://localhost:3000) in your browser.*
