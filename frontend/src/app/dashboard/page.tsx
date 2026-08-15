@@ -25,7 +25,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center p-6 md:p-12 pt-32 relative">
+    <div className="flex-1 flex flex-col items-center p-6 md:p-12  relative">
       <div className="glow-orb top-0 left-1/3" />
       
       <div className="max-w-4xl w-full z-10">

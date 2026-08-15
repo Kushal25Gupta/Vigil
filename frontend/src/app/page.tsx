@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <div className="flex-1 flex flex-col relative overflow-hidden pt-20">
+    <div className="flex-1 flex flex-col relative overflow-hidden ">
       <div className="glow-orb top-1/4 left-1/4" />
       <div className="glow-orb bottom-1/4 right-1/4" style={{ background: '#3b82f6', animationDelay: '2s' }} />
       

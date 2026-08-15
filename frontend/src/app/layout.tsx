@@ -21,7 +21,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-black text-white min-h-screen flex flex-col`}>
         <WalletProvider>
           <Navbar />
-          <main className="flex-1 flex flex-col">{children}</main>
+          <main className="flex-1 flex flex-col pt-24">{children}</main>
         </WalletProvider>
       </body>
     </html>

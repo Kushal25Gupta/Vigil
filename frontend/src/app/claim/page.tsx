@@ -18,7 +18,7 @@ export default function Claim() {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-6 pt-32 relative">
+    <div className="flex-1 flex flex-col items-center justify-center p-6  relative">
       <div className="glow-orb top-1/4 right-1/4" style={{ background: '#ec4899', animationDelay: '1s' }} />
 
       <div className="max-w-xl w-full z-10">
