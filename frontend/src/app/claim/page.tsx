@@ -16,48 +16,72 @@ export default function Claim() {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-12">
-      <div className="max-w-md w-full bg-gray-900 border border-gray-800 rounded-xl p-8">
-        <h2 className="text-2xl font-bold mb-2 text-center">Claim Portal</h2>
-        <p className="text-gray-400 text-sm mb-8 text-center">
-          Provide the Vault ID and generate a ZK proof of heir identity to unlock shielded funds.
-        </p>
-        
-        {status && (
-          <div className={`px-4 py-3 rounded-lg mb-6 text-sm ${
-            status.includes("Valid") 
-              ? "bg-green-900/30 border border-green-800 text-green-300" 
-              : "bg-blue-900/30 border border-blue-800 text-blue-300 animate-pulse"
-          }`}>
-            {status}
-          </div>
-        )}
+    <div className="flex-1 flex flex-col items-center justify-center p-6 pt-32 relative">
+      <div className="glow-orb top-1/4 right-1/4" style={{ background: '#ec4899', animationDelay: '1s' }} />
 
-        <div className="space-y-4 mb-8">
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">Vault ID</label>
-            <input 
-              type="text" 
-              value={vaultId}
-              onChange={(e) => setVaultId(e.target.value)}
-              placeholder="e.g. 0x8f...3b9a" 
-              className="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white transition-colors"
-            />
+      <div className="max-w-xl w-full z-10">
+        <div className="text-center mb-10">
+          <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-lg shadow-pink-500/20">
+            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
           </div>
+          <h2 className="text-4xl font-black mb-3 text-white">Claim Portal</h2>
+          <p className="text-gray-400 text-lg">
+            Provide the Vault ID to generate your ZK identity proof and unlock the shielded funds.
+          </p>
         </div>
         
-        <button 
-          onClick={handleClaim}
-          disabled={isProcessing || !vaultId}
-          className="w-full bg-white text-black py-4 rounded-lg font-bold hover:bg-gray-200 transition-colors disabled:opacity-50"
-        >
-          Verify & Claim
-        </button>
-        
-        <div className="mt-6 p-4 bg-black border border-gray-800 rounded-lg">
-          <p className="text-xs text-gray-500 leading-relaxed">
-            <strong>How it works:</strong> The Midnight smart contract will verify if the interval has lapsed. If true, your browser will generate a zero-knowledge proof that you are the designated heir without revealing your identity to the network.
-          </p>
+        <div className="glass-panel p-8 md:p-10 rounded-3xl border border-white/10 shadow-2xl backdrop-blur-xl bg-black/40">
+          {status && (
+            <div className={`px-6 py-4 rounded-xl mb-8 flex items-center gap-3 ${
+              status.includes("Valid") 
+                ? "bg-green-500/10 border border-green-500/30 text-green-400" 
+                : "bg-blue-500/10 border border-blue-500/30 text-blue-400 animate-pulse"
+            }`}>
+              <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {status.includes("Valid") 
+                  ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                }
+              </svg>
+              <span className="font-medium">{status}</span>
+            </div>
+          )}
+
+          <div className="space-y-6 mb-8">
+            <div>
+              <label className="block text-sm font-bold text-gray-300 mb-3 uppercase tracking-wider">Secure Vault ID</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </div>
+                <input 
+                  type="text" 
+                  value={vaultId}
+                  onChange={(e) => setVaultId(e.target.value)}
+                  placeholder="e.g. 0x8fB3...9A1c" 
+                  className="w-full bg-black/50 border border-white/10 rounded-xl pl-11 pr-4 py-4 text-white text-lg focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+                />
+              </div>
+            </div>
+          </div>
+          
+          <button 
+            onClick={handleClaim}
+            disabled={isProcessing || !vaultId}
+            className="w-full btn-gradient text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            Verify & Unshield Funds
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+          </button>
+          
+          <div className="mt-8 pt-6 border-t border-white/10">
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-gray-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+              <p className="text-xs text-gray-500 leading-relaxed font-medium">
+                The smart contract enforces a strict time-lock. If the interval has lapsed, this portal generates a Zero-Knowledge proof of your identity on your local device. The Midnight network validates the proof without exposing your wallet address or the inherited amount.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
