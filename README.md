@@ -112,8 +112,8 @@ If you have Docker installed, you can use our automated setup script to build an
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Kushal25Gupta/Vigil.git
-cd Vigil
+git clone https://github.com/Kushal25Gupta/vigil.git
+cd vigil
 
 # 2. Make the script executable
 chmod +x run.sh
@@ -127,8 +127,8 @@ chmod +x run.sh
 If you prefer to run the Docker commands manually:
 
 ```bash
-git clone https://github.com/Kushal25Gupta/Vigil.git
-cd Vigil/frontend
+git clone https://github.com/Kushal25Gupta/vigil.git
+cd vigil/frontend
 
 docker build -t vigil-frontend .
 docker run -p 3000:3000 vigil-frontend
@@ -138,8 +138,8 @@ docker run -p 3000:3000 vigil-frontend
 Ensure you have Node.js v18 or higher installed.
 
 ```bash
-git clone https://github.com/Kushal25Gupta/Vigil.git
-cd Vigil/frontend
+git clone https://github.com/Kushal25Gupta/vigil.git
+cd vigil/frontend
 
 npm ci
 npm run dev
