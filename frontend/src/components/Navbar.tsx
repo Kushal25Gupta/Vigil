@@ -35,7 +35,7 @@ export default function Navbar() {
             } disabled:opacity-70 disabled:cursor-not-allowed`}
           >
             {isConnected && <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />}
-            {isConnecting ? "Connecting..." : isConnected ? "0xLace...Connected" : "Connect Wallet"}
+            {isConnecting ? "Connecting..." : isConnected ? walletAddress ?? "Lace connected" : "Connect Wallet"}
           </button>
         </div>
       </div>

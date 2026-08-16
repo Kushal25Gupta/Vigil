@@ -147,7 +147,7 @@ npm run dev
 *Open [http://localhost:3000](http://localhost:3000) in your browser.*
 
 ### How to Test the MVP Flow
-1. **Authentication:** Click **"Connect Wallet"** in the navigation bar. Accept the mock wallet prompt if you do not have the Lace extension.
+1. **Authentication:** Click **"Connect Wallet"** in the navigation bar. For a real connection, create or unlock a Midnight wallet in Lace and choose the same network as the app (Preprod by default; use `NEXT_PUBLIC_MIDNIGHT_NETWORK=preview` for Preview). The mock-wallet prompt is only for exploring the UI.
 2. **Owner Flow:** Navigate to **"Dashboard"**. You will see the active vault interface. Click **"Ping (Proof of Life)"** to simulate the local generation of a Zero-Knowledge ownership proof.
 3. **Heir Flow:** Navigate to the **"Claim Portal"**. Enter a test Vault ID (e.g. `0x8fB3`) and click **"Verify & Unshield Funds"** to simulate the smart contract time-lock validation and ZK identity proof generation.
 

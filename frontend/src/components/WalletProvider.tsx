@@ -1,4 +1,5 @@
 "use client";
+
 import React, { createContext, useContext, useState } from "react";
 
 interface WalletContextType {
@@ -8,43 +9,76 @@ interface WalletContextType {
   isConnecting: boolean;
 }
 
-const WalletContext = createContext<WalletContextType | undefined>(undefined);
+type MidnightNetwork = "preprod" | "preview";
 
-function getWalletConnector(): any {
-  if (typeof window === "undefined") return null;
-
-  const globalWindow = window as any;
-
-  return (
-    globalWindow?.midnight?.mnLace ??
-    globalWindow?.midnight?.connector ??
-    globalWindow?.lace ??
-    globalWindow?.midnight ??
-    null
-  );
+interface InitialWalletApi {
+  name?: string;
+  rdns?: string;
+  connect: (networkId: MidnightNetwork) => Promise<ConnectedWalletApi>;
 }
 
-async function resolveWalletAddress(api: any): Promise<string | null> {
-  if (!api) return null;
+interface ConnectedWalletApi {
+  state?: () => Promise<{ address?: string }>;
+  getUnshieldedAddress?: () => Promise<string>;
+  getShieldedAddress?: () => Promise<string>;
+}
 
+const WalletContext = createContext<WalletContextType | undefined>(undefined);
+const DETECTION_TIMEOUT_MS = 3_000;
+const DETECTION_INTERVAL_MS = 150;
+
+function isInitialWalletApi(value: unknown): value is InitialWalletApi {
+  return typeof value === "object" && value !== null &&
+    typeof (value as InitialWalletApi).connect === "function";
+}
+
+function findWallet(): InitialWalletApi | null {
+  if (typeof window === "undefined") return null;
+
+  const injectedWallets = Object.values(
+    (window as Window & { midnight?: Record<string, unknown> }).midnight ?? {},
+  ).filter(isInitialWalletApi);
+
+  // Lace exposes an alias in some versions, but DApp Connector v4 wallets can
+  // also be registered under a generated key.
+  return injectedWallets.find((wallet) =>
+    wallet.name?.toLowerCase().includes("lace") || wallet.rdns?.toLowerCase().includes("lace"),
+  ) ?? injectedWallets[0] ?? null;
+}
+
+async function waitForWallet(): Promise<InitialWalletApi | null> {
+  const immediatelyAvailable = findWallet();
+  if (immediatelyAvailable) return immediatelyAvailable;
+
+  return new Promise((resolve) => {
+    const startedAt = Date.now();
+    const interval = window.setInterval(() => {
+      const wallet = findWallet();
+      if (wallet || Date.now() - startedAt >= DETECTION_TIMEOUT_MS) {
+        window.clearInterval(interval);
+        resolve(wallet);
+      }
+    }, DETECTION_INTERVAL_MS);
+  });
+}
+
+async function resolveWalletAddress(api: ConnectedWalletApi): Promise<string | null> {
   try {
-    const usedAddresses = api.getUsedAddresses ? await api.getUsedAddresses() : null;
-    if (Array.isArray(usedAddresses) && usedAddresses.length > 0) {
-      return usedAddresses[0];
-    }
+    if (api.getUnshieldedAddress) return api.getUnshieldedAddress();
+    if (api.getShieldedAddress) return api.getShieldedAddress();
 
-    const unusedAddresses = api.getUnusedAddresses ? await api.getUnusedAddresses() : null;
-    if (Array.isArray(unusedAddresses) && unusedAddresses.length > 0) {
-      return unusedAddresses[0];
-    }
-
-    const address = api.address ?? api.wallet?.address ?? api.account?.address ?? null;
-    if (address) return String(address);
+    const state = api.state ? await api.state() : null;
+    return state?.address ?? null;
   } catch (error) {
-    console.warn("Unable to read wallet address from connector:", error);
+    // A connected API is still valid if this optional display field differs
+    // between connector versions.
+    console.warn("Could not read the wallet address:", error);
+    return null;
   }
+}
 
-  return null;
+function configuredNetwork(): MidnightNetwork {
+  return process.env.NEXT_PUBLIC_MIDNIGHT_NETWORK === "preview" ? "preview" : "preprod";
 }
 
 export function WalletProvider({ children }: { children: React.ReactNode }) {
@@ -56,31 +90,31 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     setIsConnecting(true);
 
     try {
-      const connector = getWalletConnector();
+      const wallet = await waitForWallet();
+      if (!wallet) {
+        const useMock = window.confirm(
+          "No Midnight-compatible Lace wallet was detected. Install and unlock Lace, then reload the page.\n\nUse the test wallet to explore the UI instead?",
+        );
 
-      if (connector) {
-        const api = typeof connector.enable === "function" ? await connector.enable() : connector;
-        const resolvedAddress = await resolveWalletAddress(api);
-
-        setIsConnected(true);
-        setWalletAddress(resolvedAddress ?? "0xLace...Connected");
+        if (useMock) {
+          await new Promise((resolve) => window.setTimeout(resolve, 800));
+          setIsConnected(true);
+          setWalletAddress("0xMock...B7a2");
+        }
         return;
       }
 
-      const useMock = window.confirm(
-        "Midnight Lace Wallet extension not detected.\n\nSince this is a demo environment, would you like to proceed using a Test Wallet to explore the application?"
-      );
+      // DApp Connector API v4: connect(), not the legacy enable() method.
+      // This opens Lace's authorization prompt for the selected network.
+      const api = await wallet.connect(configuredNetwork());
+      const address = await resolveWalletAddress(api);
 
-      if (useMock) {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        setIsConnected(true);
-        setWalletAddress("0xMock...B7a2");
-      }
+      setIsConnected(true);
+      setWalletAddress(address ?? "Lace connected");
     } catch (error) {
       console.error("Wallet connection failed:", error);
-      window.alert(
-        "The Lace extension was detected but could not be enabled. Please reload the page and approve wallet access in Lace."
-      );
+      const reason = error instanceof Error ? error.message : "Unknown wallet error";
+      window.alert(`Lace could not connect: ${reason}`);
     } finally {
       setIsConnecting(false);
     }
@@ -95,8 +129,6 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
 export function useWallet() {
   const context = useContext(WalletContext);
-  if (!context) {
-    throw new Error("useWallet must be used within a WalletProvider");
-  }
+  if (!context) throw new Error("useWallet must be used within a WalletProvider");
   return context;
 }
