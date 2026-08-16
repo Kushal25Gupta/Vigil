@@ -7,7 +7,7 @@ export default function Claim() {
   const [vaultId, setVaultId] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { isConnected, connectWallet, isConnecting } = useWallet();
+  const { isConnected, connectWallet, isConnecting, walletMode } = useWallet();
 
   const handleClaim = async () => {
     setIsProcessing(true);
@@ -49,6 +49,17 @@ export default function Claim() {
           </div>
         ) : (
           <div className="glass-panel p-8 md:p-10 rounded-3xl border border-white/10 shadow-2xl backdrop-blur-xl bg-black/40">
+            <div className={`mb-8 rounded-xl border px-5 py-4 text-sm ${
+              walletMode === "demo"
+                ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
+                : "border-blue-500/30 bg-blue-500/10 text-blue-200"
+            }`}>
+              {walletMode === "demo" ? (
+                <><strong>Demo mode:</strong> no wallet is connected and this claim flow is simulated.</>
+              ) : (
+                <><strong>Lace connected:</strong> this MVP claim flow is simulated and does not yet submit a Midnight transaction.</>
+              )}
+            </div>
             {status && (
               <div className={`px-6 py-4 rounded-xl mb-8 flex items-center gap-3 ${
                 status.includes("Valid") 
@@ -88,7 +99,7 @@ export default function Claim() {
               disabled={isProcessing || !vaultId}
               className="w-full btn-gradient text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              Verify & Unshield Funds
+              Simulate Claim Verification
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
             </button>
             

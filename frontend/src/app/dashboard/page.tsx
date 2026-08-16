@@ -6,7 +6,7 @@ import { useWallet } from "@/components/WalletProvider";
 export default function Dashboard() {
   const [status, setStatus] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { isConnected, connectWallet, isConnecting } = useWallet();
+  const { isConnected, connectWallet, isConnecting, walletMode } = useWallet();
 
   const handlePing = async () => {
     setIsProcessing(true);
@@ -51,6 +51,17 @@ export default function Dashboard() {
           </div>
         ) : (
           <>
+            <div className={`mb-8 rounded-xl border px-6 py-4 ${
+              walletMode === "demo"
+                ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
+                : "border-blue-500/30 bg-blue-500/10 text-blue-200"
+            }`}>
+              {walletMode === "demo" ? (
+                <><strong>Demo mode:</strong> this is not a Lace connection. The actions below are simulations and do not submit transactions.</>
+              ) : (
+                <><strong>Lace connected:</strong> Vigil’s current Ping and Cancel flows are UI simulations; they do not yet submit a Midnight transaction.</>
+              )}
+            </div>
             {status && (
               <div className="glass-panel border-blue-500/50 text-blue-300 px-6 py-4 rounded-xl mb-8 flex items-center gap-3 animate-pulse">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
@@ -103,7 +114,7 @@ export default function Dashboard() {
                   className="flex-1 btn-gradient text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-blue-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                  Ping (Proof of Life)
+                  Simulate Ping
                 </button>
                 <button 
                   onClick={handleCancel}

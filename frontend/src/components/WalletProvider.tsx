@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState } from "react";
 interface WalletContextType {
   isConnected: boolean;
   walletAddress: string | null;
+  walletMode: "lace" | "demo" | null;
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   isConnecting: boolean;
@@ -85,20 +86,8 @@ function configuredNetwork(): MidnightNetwork {
 export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [walletMode, setWalletMode] = useState<"lace" | "demo" | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-
-  React.useEffect(() => {
-    try {
-      const storedConnected = localStorage.getItem("vigil_wallet_connected");
-      const storedAddress = localStorage.getItem("vigil_wallet_address");
-      if (storedConnected === "true" && storedAddress) {
-        setIsConnected(true);
-        setWalletAddress(storedAddress);
-      }
-    } catch (e) {
-      console.warn("Could not load wallet state from localStorage:", e);
-    }
-  }, []);
 
   const connectWallet = async () => {
     setIsConnecting(true);
@@ -106,22 +95,15 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     try {
       const wallet = await waitForWallet();
       if (!wallet) {
-        const customAddr = window.prompt(
-          "No Midnight-compatible Lace wallet was detected.\n\nEnter a wallet address to connect with (or click OK for default test wallet address):",
-          "0xMock_Vigil_Owner_9a4F...B7a2"
+        const useDemoWallet = window.confirm(
+          "No Midnight-compatible Lace wallet was detected.\n\nUse a demo wallet to explore simulated flows? This does not connect a wallet or submit blockchain transactions.",
         );
 
-        if (customAddr !== null) {
-          const addr = customAddr.trim() || "0xMock_Vigil_Owner_9a4F...B7a2";
+        if (useDemoWallet) {
           await new Promise((resolve) => window.setTimeout(resolve, 400));
           setIsConnected(true);
-          setWalletAddress(addr);
-          try {
-            localStorage.setItem("vigil_wallet_connected", "true");
-            localStorage.setItem("vigil_wallet_address", addr);
-          } catch (e) {
-            console.warn("Could not save wallet state:", e);
-          }
+          setWalletAddress("Demo wallet");
+          setWalletMode("demo");
         }
         return;
       }
@@ -134,13 +116,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       const finalAddress = address ?? "Lace connected";
       setIsConnected(true);
       setWalletAddress(finalAddress);
-
-      try {
-        localStorage.setItem("vigil_wallet_connected", "true");
-        localStorage.setItem("vigil_wallet_address", finalAddress);
-      } catch (e) {
-        console.warn("Could not save wallet state:", e);
-      }
+      setWalletMode("lace");
     } catch (error) {
       console.error("Wallet connection failed:", error);
       const reason = error instanceof Error ? error.message : "Unknown wallet error";
@@ -153,16 +129,11 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const disconnectWallet = () => {
     setIsConnected(false);
     setWalletAddress(null);
-    try {
-      localStorage.removeItem("vigil_wallet_connected");
-      localStorage.removeItem("vigil_wallet_address");
-    } catch (e) {
-      console.warn("Could not remove wallet state:", e);
-    }
+    setWalletMode(null);
   };
 
   return (
-    <WalletContext.Provider value={{ isConnected, walletAddress, connectWallet, disconnectWallet, isConnecting }}>
+    <WalletContext.Provider value={{ isConnected, walletAddress, walletMode, connectWallet, disconnectWallet, isConnecting }}>
       {children}
     </WalletContext.Provider>
   );

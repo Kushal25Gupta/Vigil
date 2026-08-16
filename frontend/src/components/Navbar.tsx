@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useWallet } from "./WalletProvider";
 
 export default function Navbar() {
-  const { isConnected, connectWallet, disconnectWallet, isConnecting, walletAddress } = useWallet();
+  const { isConnected, connectWallet, disconnectWallet, isConnecting, walletAddress, walletMode } = useWallet();
 
   return (
     <nav className="fixed top-0 w-full z-50 glass-panel border-b border-white/5 transition-all duration-300">
@@ -37,9 +37,13 @@ export default function Navbar() {
               </button>
             ) : (
               <div className="flex items-center gap-2">
-                <div className="px-5 py-2 rounded-full font-bold transition-all flex items-center gap-2 bg-green-500/10 text-green-400 border border-green-500/20">
-                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                  <span>{walletAddress ?? "Lace connected"}</span>
+                <div className={`px-5 py-2 rounded-full font-bold transition-all flex items-center gap-2 border ${
+                  walletMode === "demo"
+                    ? "bg-amber-500/10 text-amber-300 border-amber-500/20"
+                    : "bg-green-500/10 text-green-400 border-green-500/20"
+                }`}>
+                  <div className={`w-2 h-2 rounded-full animate-pulse ${walletMode === "demo" ? "bg-amber-300" : "bg-green-400"}`} />
+                  <span>{walletMode === "demo" ? "Demo wallet" : walletAddress ?? "Lace connected"}</span>
                 </div>
                 <button
                   onClick={disconnectWallet}
