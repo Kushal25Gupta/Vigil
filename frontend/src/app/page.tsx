@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <div className="flex-1 flex flex-col relative overflow-hidden ">
@@ -24,13 +26,13 @@ export default function Home() {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <a href="/dashboard" className="px-8 py-4 btn-gradient text-white rounded-xl font-bold text-lg text-center flex items-center justify-center gap-2">
+          <Link href="/dashboard" className="px-8 py-4 btn-gradient text-white rounded-xl font-bold text-lg text-center flex items-center justify-center gap-2">
             Initialize Vault
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-          </a>
-          <a href="/claim" className="px-8 py-4 glass-panel text-white hover:bg-white/5 border border-white/10 rounded-xl font-bold text-lg text-center transition-all">
+          </Link>
+          <Link href="/claim" className="px-8 py-4 glass-panel text-white hover:bg-white/5 border border-white/10 rounded-xl font-bold text-lg text-center transition-all">
             Claim Inheritance
-          </a>
+          </Link>
         </div>
       </div>
 

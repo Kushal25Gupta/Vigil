@@ -6,6 +6,7 @@ interface WalletContextType {
   isConnected: boolean;
   walletAddress: string | null;
   connectWallet: () => Promise<void>;
+  disconnectWallet: () => void;
   isConnecting: boolean;
 }
 
@@ -86,20 +87,41 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
 
+  React.useEffect(() => {
+    try {
+      const storedConnected = localStorage.getItem("vigil_wallet_connected");
+      const storedAddress = localStorage.getItem("vigil_wallet_address");
+      if (storedConnected === "true" && storedAddress) {
+        setIsConnected(true);
+        setWalletAddress(storedAddress);
+      }
+    } catch (e) {
+      console.warn("Could not load wallet state from localStorage:", e);
+    }
+  }, []);
+
   const connectWallet = async () => {
     setIsConnecting(true);
 
     try {
       const wallet = await waitForWallet();
       if (!wallet) {
-        const useMock = window.confirm(
-          "No Midnight-compatible Lace wallet was detected. Install and unlock Lace, then reload the page.\n\nUse the test wallet to explore the UI instead?",
+        const customAddr = window.prompt(
+          "No Midnight-compatible Lace wallet was detected.\n\nEnter a wallet address to connect with (or click OK for default test wallet address):",
+          "0xMock_Vigil_Owner_9a4F...B7a2"
         );
 
-        if (useMock) {
-          await new Promise((resolve) => window.setTimeout(resolve, 800));
+        if (customAddr !== null) {
+          const addr = customAddr.trim() || "0xMock_Vigil_Owner_9a4F...B7a2";
+          await new Promise((resolve) => window.setTimeout(resolve, 400));
           setIsConnected(true);
-          setWalletAddress("0xMock...B7a2");
+          setWalletAddress(addr);
+          try {
+            localStorage.setItem("vigil_wallet_connected", "true");
+            localStorage.setItem("vigil_wallet_address", addr);
+          } catch (e) {
+            console.warn("Could not save wallet state:", e);
+          }
         }
         return;
       }
@@ -109,8 +131,16 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       const api = await wallet.connect(configuredNetwork());
       const address = await resolveWalletAddress(api);
 
+      const finalAddress = address ?? "Lace connected";
       setIsConnected(true);
-      setWalletAddress(address ?? "Lace connected");
+      setWalletAddress(finalAddress);
+
+      try {
+        localStorage.setItem("vigil_wallet_connected", "true");
+        localStorage.setItem("vigil_wallet_address", finalAddress);
+      } catch (e) {
+        console.warn("Could not save wallet state:", e);
+      }
     } catch (error) {
       console.error("Wallet connection failed:", error);
       const reason = error instanceof Error ? error.message : "Unknown wallet error";
@@ -120,8 +150,19 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const disconnectWallet = () => {
+    setIsConnected(false);
+    setWalletAddress(null);
+    try {
+      localStorage.removeItem("vigil_wallet_connected");
+      localStorage.removeItem("vigil_wallet_address");
+    } catch (e) {
+      console.warn("Could not remove wallet state:", e);
+    }
+  };
+
   return (
-    <WalletContext.Provider value={{ isConnected, walletAddress, connectWallet, isConnecting }}>
+    <WalletContext.Provider value={{ isConnected, walletAddress, connectWallet, disconnectWallet, isConnecting }}>
       {children}
     </WalletContext.Provider>
   );
